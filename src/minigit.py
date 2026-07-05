@@ -6,6 +6,7 @@ from commits import create_commit, format_commit_log, read_commits
 from index import update_index
 from objects import store_object
 from repository import init_repository
+from status import format_status_report, get_status
 from utils import hash_file
 
 
@@ -30,6 +31,8 @@ def build_parser():
 
     checkout_parser = subparsers.add_parser("checkout", help="Restore workspace files from a commit")
     checkout_parser.add_argument("commit_number", help="Commit number to restore")
+
+    subparsers.add_parser("status", help="Show workspace status")
 
     return parser
 
@@ -73,6 +76,14 @@ def main():
     elif args.command == "checkout":
         _, message = restore_commit(args.commit_number)
         print(message)
+    elif args.command == "status":
+        ok, message, status = get_status()
+
+        if not ok:
+            print(message)
+            return
+
+        print(format_status_report(status))
 
 
 if __name__ == "__main__":
