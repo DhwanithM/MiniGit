@@ -1,12 +1,9 @@
-from pathlib import Path
-
-from repository import MINIGIT_DIR
+from repository import get_minigit_path
 
 
 def update_index(filename, digest, repository_path="."):
-    """Add or replace a filename-to-hash entry in the MiniGit index."""
-    root = Path(repository_path).resolve()
-    index_path = root / MINIGIT_DIR / "index"
+    """Add or replace a workspace-relative filename-to-hash entry."""
+    index_path = get_minigit_path(repository_path) / "index"
     entries = {}
 
     if index_path.exists():

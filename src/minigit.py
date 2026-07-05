@@ -1,6 +1,7 @@
 import argparse
 from pathlib import Path
 
+from checkout import restore_commit
 from commits import create_commit, format_commit_log, read_commits
 from index import update_index
 from objects import store_object
@@ -20,12 +21,15 @@ def build_parser():
     hash_parser.add_argument("filename", help="File to hash")
 
     add_parser = subparsers.add_parser("add", help="Store a file as a MiniGit object")
-    add_parser.add_argument("filename", help="File to store")
+    add_parser.add_argument("filename", help="Workspace file to store")
 
     commit_parser = subparsers.add_parser("commit", help="Create a commit from the staging index")
     commit_parser.add_argument("message", help="Commit message")
 
     subparsers.add_parser("log", help="Show commit history")
+
+    checkout_parser = subparsers.add_parser("checkout", help="Restore workspace files from a commit")
+    checkout_parser.add_argument("commit_number", help="Commit number to restore")
 
     return parser
 
@@ -66,6 +70,9 @@ def main():
             return
 
         print(format_commit_log(commits))
+    elif args.command == "checkout":
+        _, message = restore_commit(args.commit_number)
+        print(message)
 
 
 if __name__ == "__main__":

@@ -1,14 +1,12 @@
 import json
 from datetime import datetime
-from pathlib import Path
 
-from repository import MINIGIT_DIR
+from repository import get_minigit_path
 
 
 def read_index(repository_path="."):
-    """Read staged filename-to-hash entries from .minigit/index."""
-    root = Path(repository_path).resolve()
-    index_path = root / MINIGIT_DIR / "index"
+    """Read staged workspace-relative filename-to-hash entries."""
+    index_path = get_minigit_path(repository_path) / "index"
     entries = {}
 
     if not index_path.exists():
@@ -39,14 +37,13 @@ def next_commit_number(commits_path):
 
 def create_commit(message, repository_path="."):
     """Create a numbered JSON commit from the current staging index."""
-    root = Path(repository_path).resolve()
-    minigit_path = root / MINIGIT_DIR
+    minigit_path = get_minigit_path(repository_path)
     commits_path = minigit_path / "commits"
 
     if not minigit_path.is_dir():
-        return False, "Error: MiniGit repository not found. Run 'python minigit.py init' first."
+        return False, "Error: MiniGit repository not found. Run 'python src/minigit.py init' first."
 
-    staged_files = read_index(root)
+    staged_files = read_index(repository_path)
     if not staged_files:
         return False, "Nothing to commit. The staging index is empty."
 
@@ -67,12 +64,11 @@ def create_commit(message, repository_path="."):
 
 def read_commits(repository_path="."):
     """Return all numbered commit JSON objects from newest to oldest."""
-    root = Path(repository_path).resolve()
-    minigit_path = root / MINIGIT_DIR
+    minigit_path = get_minigit_path(repository_path)
     commits_path = minigit_path / "commits"
 
     if not minigit_path.is_dir():
-        return False, "Error: MiniGit repository not found. Run 'python minigit.py init' first.", []
+        return False, "Error: MiniGit repository not found. Run 'python src/minigit.py init' first.", []
 
     commits = []
     for commit_file in commits_path.glob("*.json"):
@@ -89,7 +85,7 @@ def read_commits(repository_path="."):
 def format_commit_log(commits):
     """Format commit metadata for display in the MiniGit log command."""
     if not commits:
-        return "No commits yet. Stage files and run 'python minigit.py commit \"message\"' first."
+        return "No commits yet. Stage files and run 'python src/minigit.py commit \"message\"' first."
 
     lines = []
     separator = "-" * 40
