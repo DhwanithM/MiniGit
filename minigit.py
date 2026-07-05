@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
 
-from commits import create_commit
+from commits import create_commit, format_commit_log, read_commits
 from index import update_index
 from objects import store_object
 from repository import init_repository
@@ -24,6 +24,8 @@ def build_parser():
 
     commit_parser = subparsers.add_parser("commit", help="Create a commit from the staging index")
     commit_parser.add_argument("message", help="Commit message")
+
+    subparsers.add_parser("log", help="Show commit history")
 
     return parser
 
@@ -56,6 +58,14 @@ def main():
     elif args.command == "commit":
         _, message = create_commit(args.message)
         print(message)
+    elif args.command == "log":
+        ok, message, commits = read_commits()
+
+        if not ok:
+            print(message)
+            return
+
+        print(format_commit_log(commits))
 
 
 if __name__ == "__main__":
