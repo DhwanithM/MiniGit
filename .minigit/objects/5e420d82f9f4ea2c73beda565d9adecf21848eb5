@@ -41,7 +41,7 @@ def main():
         digest = hash_file(file_path)
         print(f"SHA-1 ({args.filename}): {digest}")
     elif args.command == "add":
-        _, message, digest = store_object(args.filename)
+        stored, message, digest = store_object(args.filename)
         print(message)
 
         if digest is None:
